@@ -1,11 +1,19 @@
 const { Telegraf, Markup } = require('telegraf');
-const path = require('path');
 const express = require('express');
+const path = require('path');
 
-// ===== Express server (ЩОБ RENDER НЕ ВБИВАВ ПРОЦЕС) =====
+// ===============================
+// 🌐 EXPRESS SERVER (ДЛЯ RENDER)
+// ===============================
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 🔥 health endpoint — ДУЖЕ ВАЖЛИВО
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+// головна сторінка (необовʼязково)
 app.get('/', (req, res) => {
   res.send('🤖 Telegram bot is running');
 });
@@ -14,7 +22,9 @@ app.listen(PORT, () => {
   console.log(`🌐 Web server running on port ${PORT}`);
 });
 
-// ===== Telegram Bot =====
+// ===============================
+// 🤖 TELEGRAM BOT
+// ===============================
 const BOT_TOKEN = process.env.BOT_TOKEN;
 
 if (!BOT_TOKEN) {
@@ -25,7 +35,9 @@ if (!BOT_TOKEN) {
 const bot = new Telegraf(BOT_TOKEN);
 console.log('🤖 Бот TransporterUA запущений');
 
-// ===== /start з картинкою =====
+// ===============================
+// /start
+// ===============================
 bot.start(async (ctx) => {
   await ctx.replyWithPhoto(
     { source: path.join(__dirname, 'images', 'Welcome.png') },
@@ -50,7 +62,9 @@ bot.start(async (ctx) => {
   );
 });
 
-// ===== Інформація про авто =====
+// ===============================
+// 🚛 ІНФО ПРО АВТО
+// ===============================
 bot.action('CAR_INFO', async (ctx) => {
   await ctx.answerCbQuery();
   await ctx.reply(
@@ -63,7 +77,9 @@ bot.action('CAR_INFO', async (ctx) => {
   );
 });
 
-// ===== Як зробити замовлення =====
+// ===============================
+// 📦 ЯК ЗАМОВИТИ
+// ===============================
 bot.action('ORDER', async (ctx) => {
   await ctx.answerCbQuery();
   await ctx.reply(
@@ -73,12 +89,14 @@ bot.action('ORDER', async (ctx) => {
 2️⃣ Узгодьте деталі  
 3️⃣ Ми заберемо вантаж 🚛
 
-👉 https://t.me/Transporter_UA_manager`,
+👉 https://t.me/TransporterUAmanager`,
     { parse_mode: 'Markdown' }
   );
 });
 
-// ===== Калькулятор =====
+// ===============================
+// 💰 КАЛЬКУЛЯТОР
+// ===============================
 const userState = {};
 
 bot.action('CALC', async (ctx) => {
@@ -95,20 +113,27 @@ bot.on('text', async (ctx) => {
 
     if (!isNaN(distance) && distance > 0) {
       const price = distance * 20;
+
       await ctx.reply(
-        `💰 *Вартість:* ${price} грн\n(20 грн / км)`,
+        `💰 *Вартість:* ${price} грн  
+_(20 грн / км)_`,
         { parse_mode: 'Markdown' }
       );
-      userState[chatId] = null;
+
+      delete userState[chatId];
     } else {
       await ctx.reply('❌ Введіть коректне число');
     }
   }
 });
 
-// ===== Запуск бота =====
+// ===============================
+// ▶️ ЗАПУСК БОТА
+// ===============================
 bot.launch();
 
-// ===== Graceful shutdown (ДУЖЕ ВАЖЛИВО ДЛЯ RENDER) =====
+// ===============================
+// 🧯 GRACEFUL SHUTDOWN (Render)
+// ===============================
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
