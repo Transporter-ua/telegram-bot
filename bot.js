@@ -39,7 +39,7 @@ bot.start(async (ctx) => {
 Оберіть дію нижче 👇`,
       parse_mode: 'Markdown',
       ...Markup.inlineKeyboard([
-        [Markup.button.url('📞 Написати менеджеру', 'https://t.me/Transporter_UA_manager')],
+        [Markup.button.url('📞 Написати менеджеру', 'https://t.me/TransporterUAmanager')],
         [
           Markup.button.callback('🚛 Інформація про авто', 'CAR_INFO'),
           Markup.button.callback('💰 Калькулятор', 'CALC')
